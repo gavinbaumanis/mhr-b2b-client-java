@@ -88,7 +88,8 @@
         <junit.version>4.13.2</junit.version>
         <commons.lang3.version>3.17.0</commons.lang3.version>
         <commons.io.version>2.18.0</commons.io.version>
-        <nehta.lib.version>1.2.1</nehta.lib.version>
+        <nehta.lib.version>1.2.2</nehta.lib.version>
+		<nehta.xsp.lib.version>1.2.1</nehta.xsp.lib.version>
         <plugin.clean.version>3.5.0</plugin.clean.version>
         <plugin.compiler.version>3.15.0</plugin.compiler.version>
         <plugin.surefire.version>3.5.5</plugin.surefire.version>
@@ -123,12 +124,12 @@
         <dependency>
             <groupId>au.gov.nehta</groupId>
             <artifactId>smi-xsp</artifactId>
-            <version>${nehta.lib.version}</version>
+            <version>${nehta.xsp.lib.version}</version>
         </dependency>
         <dependency>
             <groupId>au.gov.nehta</groupId>
             <artifactId>smi-common-utils</artifactId>
-            <version>${nehta.lib.version}</version>
+            <version>${nehta.xsp.lib.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
