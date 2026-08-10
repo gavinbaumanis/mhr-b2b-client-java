@@ -1,5 +1,9 @@
 # Change Log/Revision History
 
+= 1.7.1-SNAPSHOT =
+==================
+- Development version after **`1.7.0`**; compile against **`pcehr-compiled-wsdl`** **`1.7.1-SNAPSHOT`**.
+
 = 1.7.0-SNAPSHOT =
 ==================
 - Java 11 / Jakarta full-WSDL line: EE4J jaxws-rt 4.0.4, compile against pcehr-compiled-wsdl 1.7.0-SNAPSHOT, 26 client facades.

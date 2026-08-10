@@ -1,6 +1,6 @@
 # MHR B2B Client
 
-Maven library for Australia's **My Health Record (PCEHR) B2B** SOAP APIs over **Jakarta XML Web Services** (version **`1.7.0`** on Maven Central; **`1.7.0-SNAPSHOT`** during local development).
+Maven library for Australia's **My Health Record (PCEHR) B2B** SOAP APIs over **Jakarta XML Web Services** (version **`1.7.0`** on Maven Central; **`1.7.1-SNAPSHOT`** during local development).
 
 **Audience:** applications that depend on **`au.gov.nehta:mhr-b2b-client`**, supply mutual-TLS credentials and ADHA-registered product metadata, and call PCEHR record access, document exchange, views, and templates. To **build or change this repository**, see **`CONTRIBUTING.md`**, **`MAINTAINERS.md`**, and **`SECURITY.md`**.
 
@@ -33,7 +33,7 @@ Use the published version from [Maven Central](https://central.sonatype.com/).
 
 ### Local development (SNAPSHOT)
 
-Install **`pcehr-compiled-wsdl-java`** at the same Maven version (**`1.7.0-SNAPSHOT`**) before building this client:
+Install **`pcehr-compiled-wsdl-java`** at the same Maven version (**`1.7.1-SNAPSHOT`**) before building this client:
 
 ```text
 cd ../pcehr-compiled-wsdl-java
@@ -81,7 +81,7 @@ Or use root **`build.ps1`** / **`build.sh`** / **`build.bat`**. Options:
 | **`wsimport`** / **`-Wsimport`** | **`-Pwsimport`** |
 | **`shaded`** / **`-Shaded`** | **`-Pfat-jar`** (uber JAR) |
 
-Compile dependency: **`pcehr-compiled-wsdl`** at **`${project.version}`** (**`1.7.0-SNAPSHOT`** during development).
+Compile dependency: **`pcehr-compiled-wsdl`** at **`${project.version}`** (**`1.7.1-SNAPSHOT`** during development).
 
 ## Tests
 

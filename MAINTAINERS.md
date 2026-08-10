@@ -44,7 +44,7 @@ builds (not HI-style licensed material) but excluded from the published JAR (mav
 | build.ps1, build.sh, build.bat | Thin wrappers around **mvn clean verify**; **wsimport** / **shaded** args |
 | .github/workflows/ci.yml | **verify** (default) and **wsimport** jobs; installs **pcehr-compiled-wsdl-java** first |
 
-Branch model (maintainer-only): **`java-11-jakarta-full-wsdl`** — JDK **11**, Jakarta XML Web Services, **`jaxws-rt` 4.0.4**, **26** facades. Compile against **`au.gov.nehta:pcehr-compiled-wsdl`** at **`${pcehr.wsdl.version}`** = **`${project.version}`** (**`1.7.0-SNAPSHOT`** during dev); install matching **`pcehr-compiled-wsdl-java`** first.
+Branch model (maintainer-only): **`java-11-jakarta-full-wsdl`** — JDK **11**, Jakarta XML Web Services, **`jaxws-rt` 4.0.4**, **26** facades. Compile against **`au.gov.nehta:pcehr-compiled-wsdl`** at **`${pcehr.wsdl.version}`** = **`${project.version}`** (**`1.7.1-SNAPSHOT`** during dev); install matching **`pcehr-compiled-wsdl-java`** first.
 
 ---
 

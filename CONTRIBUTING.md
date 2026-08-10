@@ -8,7 +8,7 @@
 
 - **JDK 11+** with **`JAVA_HOME`** set (`maven.compiler.release` in **`pom.xml`**).
 - **Maven 3.6+** on **`PATH`**.
-- **`pcehr-compiled-wsdl-java`** at version **`${project.version}`** (**`1.7.0-SNAPSHOT`**) installed locally (`mvn install`). See **`README.md`**.
+- **`pcehr-compiled-wsdl-java`** at version **`${project.version}`** (**`1.7.1-SNAPSHOT`**) installed locally (`mvn install`). See **`README.md`**.
 
 ---
 

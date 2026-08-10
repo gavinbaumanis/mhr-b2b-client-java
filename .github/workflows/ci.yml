@@ -25,7 +25,7 @@ jobs:
           distribution: temurin
           java-version: "11"
           cache: maven
-      - name: Install pcehr-compiled-wsdl (1.7.0-SNAPSHOT)
+      - name: Install pcehr-compiled-wsdl (1.7.1-SNAPSHOT)
         working-directory: pcehr-compiled-wsdl-java
         run: mvn -B "-Dgpg.skip=true" clean install -DskipTests
       - name: Maven verify (default)
@@ -46,7 +46,7 @@ jobs:
           distribution: temurin
           java-version: "11"
           cache: maven
-      - name: Install pcehr-compiled-wsdl (1.7.0-SNAPSHOT)
+      - name: Install pcehr-compiled-wsdl (1.7.1-SNAPSHOT)
         working-directory: pcehr-compiled-wsdl-java
         run: mvn -B "-Dgpg.skip=true" clean install -DskipTests
       - name: Maven verify (-Pwsimport)

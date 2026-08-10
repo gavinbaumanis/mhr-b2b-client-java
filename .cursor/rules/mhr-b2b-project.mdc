@@ -13,7 +13,7 @@ My Health Record **PCEHR B2B** client — **not** Healthcare Identifiers (HI). D
 | ---- | ---- | ---- | ---- |
 | **1.7.0** | 11 | Jakarta | **26** (full WSDL line) |
 
-**This checkout:** **`1.7.0-SNAPSHOT`** — **`au.gov.nehta:pcehr-compiled-wsdl`** at **`${project.version}`**; Java **11** / **`jakarta.*`** XML APIs.
+**This checkout:** **`1.7.1-SNAPSHOT`** — **`au.gov.nehta:pcehr-compiled-wsdl`** at **`${project.version}`**; Java **11** / **`jakarta.*`** XML APIs.
 
 ## WSDL/XSD (committed in Git)
 
