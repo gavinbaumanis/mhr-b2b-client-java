@@ -125,12 +125,12 @@
         <dependency>
             <groupId>au.gov.nehta</groupId>
             <artifactId>smi-xsp</artifactId>
-            <version>${nehta.lib.version}</version>
+            <version>${nehta.xsp.lib.version}</version>
         </dependency>
         <dependency>
             <groupId>au.gov.nehta</groupId>
             <artifactId>smi-common-utils</artifactId>
-            <version>${nehta.lib.version}</version>
+            <version>${nehta.xsp.lib.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
