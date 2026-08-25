@@ -16,11 +16,11 @@ Published releases are consumed from **[Maven Central](https://central.sonatype.
 <dependency>
   <groupId>au.gov.nehta</groupId>
   <artifactId>mhr-b2b-client</artifactId>
-  <version>11.0.0</version>
+  <version>17.0.0</version>
 </dependency>
 ```
 
-**This line (`11.0.0`):** Java **11**, **Jakarta XML Web Services / JAXB**, **15** facade clients. Runtime SOAP stack is Eclipse EE4J **`com.sun.xml.ws:jaxws-rt`** **4.0.5**. Pair with **`au.gov.nehta:mhr-wsdl`** **`11.0.0`**. Do **not** use legacy Metro **`webservices-*`** bundles.
+**This line (`17.0.0`):** Java **17**, **Jakarta XML Web Services / JAXB**, **15** facade clients. Runtime SOAP stack is Eclipse EE4J **`com.sun.xml.ws:jaxws-rt`** **4.0.5**. Pair with **`au.gov.nehta:mhr-wsdl`** **`17.0.0`**. Sibling libs **`common-library`**, **`smi-xsp`**, and **`smi-common-utils`** use the same Maven version. Do **not** use legacy Metro **`webservices-*`** bundles.
 
 When **`mhr-wsdl`** is also on the classpath, use the **same** Maven version for both artifacts.
 
@@ -33,9 +33,9 @@ The **first number** of the Maven version is the **Java SE** version that this c
 | Maven version | Java SE | XML stack                               | Facades          |
 | ------------- | ------- | --------------------------------------- | ---------------- |
 | **11.0.0**    | **11**  | **Jakarta** / EE4J **`jaxws-rt` 4.0.x** | **15** (MHR B2B) |
-| **17.0.0.1**  | **17**  | **Jakarta** / EE4J **`jaxws-rt` 4.0.x** | **15** (MHR B2B) |
-| **21.0.0.1**  | **21**  | **Jakarta** / EE4J **`jaxws-rt` 4.0.x** | **15** (MHR B2B) |
-| **24.0.0.1**  | **24**  | **Jakarta** / EE4J **`jaxws-rt` 4.0.x** | **15** (MHR B2B) |
+| **17.0.0**    | **17**  | **Jakarta** / EE4J **`jaxws-rt` 4.0.x** | **15** (MHR B2B) |
+| **21.0.0**    | **21**  | **Jakarta** / EE4J **`jaxws-rt` 4.0.x** | **15** (MHR B2B) |
+| **24.0.0**    | **24**  | **Jakarta** / EE4J **`jaxws-rt` 4.0.x** | **15** (MHR B2B) |
 
 Pick the coordinate that matches your JDK. Do not mix **`mhr-b2b-client`** versions with **`mhr-wsdl`** from a different line. All published versions are on **[Maven Central](https://central.sonatype.com/)**.
 
@@ -45,23 +45,23 @@ Java packages and type names use **`mhr`** (`au.gov.nehta.vendorlibrary.mhr`, **
 
 ## Note
 
-The **11.0.0** JAR ships **15** MHR B2B facade clients on **Jakarta**. That set matches the logical B2B interfaces in **mhr-b2b-client-dotnet** (including **getView** and its **7** clinical views). See **ADHA-THIRD-PARTY-SCOPE.md**.
+The **17.0.0** JAR ships **15** MHR B2B facade clients on **Jakarta**. That set matches the logical B2B interfaces in **mhr-b2b-client-dotnet** (including **getView** and its **7** clinical views). See **ADHA-THIRD-PARTY-SCOPE.md**.
 
 ---
 
 ## Local development (SNAPSHOT)
 
-This repository builds **`11.0.0-SNAPSHOT`**. Install unpublished **`mhr-wsdl`** **first** at the **same Maven version**, then **`verify`** here:
+This repository builds **`17.0.0-SNAPSHOT`**. Install unpublished sibling **`au.gov.nehta`** libs at the **same Maven version** first (**`mhr-wsdl`**, **`common-library`**, **`smi-xsp`**, **`smi-common-utils`**), then **`verify`** here:
 
 ```text
-# 1) mhr-wsdl-java
+# 1) sibling au.gov.nehta libs (same version)
 mvn -B "-Dgpg.skip=true" clean install
 
 # 2) mhr-b2b-client-java
 mvn -B "-Dgpg.skip=true" clean verify
 ```
 
-If Maven warns that a **GA** POM is missing (for example **`11.0.0`** before Central publish), clear stale **`au/gov/nehta/mhr-wsdl`** entries in your **local Maven repository** (folders with only **`.lastUpdated`** files) and reinstall the SNAPSHOT. **`mvn clean`** in this project does not clear the local repository cache.
+If Maven warns that a **GA** POM is missing (for example **`17.0.0`** before Central publish), clear stale **`au/gov/nehta/`** entries in your **local Maven repository** (folders with only **`.lastUpdated`** files) and reinstall the SNAPSHOTs. **`mvn clean`** in this project does not clear the local repository cache.
 
 ---
 
@@ -114,7 +114,7 @@ Package base: **`au.gov.nehta.vendorlibrary.mhr.clients`**.
 
 ## Build and test
 
-From the repository root (after **`mhr-wsdl`** is resolvable):
+From the repository root (after sibling **`au.gov.nehta`** libs are resolvable):
 
 ```text
 mvn -B "-Dgpg.skip=true" clean verify
@@ -133,7 +133,7 @@ Optional: **`./build.sh`**, **`build.ps1`**.
 
 | Repository                                                                  | Role                                                     |
 | --------------------------------------------------------------------------- | -------------------------------------------------------- |
-| [mhr-wsdl-java](https://github.com/AuDigitalHealth/mhr-wsdl-java)           | Generated MHR SOAP types (**11.0.0**, Java 11 / Jakarta) |
+| [mhr-wsdl-java](https://github.com/AuDigitalHealth/mhr-wsdl-java)           | Generated MHR SOAP types (**17.0.0**, Java 17 / Jakarta) |
 | [hi-b2b-client-java](https://github.com/AuDigitalHealth/hi-b2b-client-java) | Healthcare Identifiers client (separate domain)          |
 
 ## Documentation

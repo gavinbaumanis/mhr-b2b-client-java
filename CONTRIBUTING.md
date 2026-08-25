@@ -4,20 +4,20 @@
 
 ## Prerequisites
 
-- **JDK 11** with **`JAVA_HOME`** set (see **`maven.compiler.release`** in **`pom.xml`**).
+- **JDK 17** with **`JAVA_HOME`** set (see **`maven.compiler.release`** in **`pom.xml`**).
 - **Maven 3.6.3+** on **`PATH`**.
 
 Dependencies resolve from **[Maven Central](https://central.sonatype.com/)** unless you are installing a **local SNAPSHOT** (below).
 
 ## Versioning
 
-The **first number** of **`au.gov.nehta:mhr-b2b-client`** is the **Java SE** version that this client targets. **11.0.0** is the Java 11 Jakarta line with **15** facades. See **`README.md`**.
+The **first number** of **`au.gov.nehta:mhr-b2b-client`** is the **Java SE** version that this client targets. **17.0.0** is the Java 17 Jakarta line with **15** facades. See **`README.md`**.
 
-**`mhr-b2b-client`** pins **`mhr-wsdl`** to **`${project.version}`**. Use the **same** version for both artifacts.
+**`mhr-b2b-client`** pins sibling **`au.gov.nehta`** libs (**`mhr-wsdl`**, **`common-library`**, **`smi-xsp`**, **`smi-common-utils`**) to **`${project.version}`**. Use the **same** version for those artifacts.
 
 ## Build
 
-From the project root, after **`mhr-wsdl`** is resolvable:
+From the project root, after sibling libs are resolvable:
 
 ```text
 mvn -B "-Dgpg.skip=true" clean verify
@@ -37,18 +37,16 @@ GPG signing is skipped by default (**`-Dgpg.skip=true`**). Release builds: **`-D
 ## Dependencies
 
 - Types: **`au.gov.nehta:mhr-wsdl`** at **`${project.version}`**.
+- Shared libs: **`common-library`**, **`smi-xsp`**, **`smi-common-utils`** at **`${project.version}`**.
 - Runtime SOAP stack: **`com.sun.xml.ws:jaxws-rt`** **4.0.5**.
 - **`maven-enforcer-plugin`** rejects Metro **`webservices-*`** and legacy **`javax.xml.ws`**, **`javax.xml.bind`**, and **`javax.xml.soap`** APIs.
 
 ## Local builds (unpublished artifacts)
 
-Install matching **`common-library`** and **`mhr-wsdl`** first (same Java line: **`11.0.0-SNAPSHOT`**):
+Install matching sibling **`au.gov.nehta`** libs first (same Java line: **`17.0.0-SNAPSHOT`**):
 
 ```text
-# in common-library-java
-mvn -B "-Dgpg.skip=true" clean install
-
-# in mhr-wsdl-java
+# in common-library-java / smi-xsp-java / smi-common-utils-java / mhr-wsdl-java
 mvn -B "-Dgpg.skip=true" clean install
 
 # in mhr-b2b-client-java

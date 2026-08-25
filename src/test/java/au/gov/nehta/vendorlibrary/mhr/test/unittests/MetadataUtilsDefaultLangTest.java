@@ -14,6 +14,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class MetadataUtilsDefaultLangTest {
 
@@ -34,7 +35,7 @@ public class MetadataUtilsDefaultLangTest {
     public void testEnUS() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         // document lang is en-US
         String doc = IOUtils.read(new File("src/test/resources/TestFiles/metadataTest/PCEHRPrescriptionRecord_3A_Min.xml"));
-        DocumentMetadata documentMetadata = MetadataUtils.toDocumentMetadata(exampleHeader, doc.getBytes());
+        DocumentMetadata documentMetadata = MetadataUtils.toDocumentMetadata(exampleHeader, doc.getBytes(StandardCharsets.UTF_8));
         // should be as specified
         Assert.assertEquals("en-US", documentMetadata.getLanguageCode());
     }
@@ -44,7 +45,7 @@ public class MetadataUtilsDefaultLangTest {
 
         // has no lang code
         String doc = IOUtils.read(new File("src/test/resources/TestFiles/metadataTest/PCEHRDispenseRecord_3A_Min.xml"));
-        DocumentMetadata documentMetadata = MetadataUtils.toDocumentMetadata(exampleHeader, doc.getBytes());
+        DocumentMetadata documentMetadata = MetadataUtils.toDocumentMetadata(exampleHeader, doc.getBytes(StandardCharsets.UTF_8));
         /// should default to au
         Assert.assertEquals("en-AU", documentMetadata.getLanguageCode());
     }
@@ -54,7 +55,7 @@ public class MetadataUtilsDefaultLangTest {
         // cups requests that no xds metadata tile is supplied with the document upload.
         // check that the title field is not filled for metadata
         String doc = IOUtils.read(new File("src/test/resources/TestFiles/metadataTest/PCEHRPrescriptionRecord_3A_Min.xml"));
-        DocumentMetadata documentMetadata = MetadataUtils.toDocumentMetadata(exampleHeader, doc.getBytes());
+        DocumentMetadata documentMetadata = MetadataUtils.toDocumentMetadata(exampleHeader, doc.getBytes(StandardCharsets.UTF_8));
         // should be null
         Assert.assertNull(documentMetadata.getTitle());
     }

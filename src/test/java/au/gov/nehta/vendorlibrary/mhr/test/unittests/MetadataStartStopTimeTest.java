@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
@@ -39,7 +40,7 @@ public class MetadataStartStopTimeTest {
     @Test
     public void testPathologyMinDocumentStartTime() throws Exception {
         String doc = IOUtils.read(new File("src/test/resources/TestFiles/pathologyDI/PathologyResultReport_3A_Min.xml"));
-        DocumentMetadata documentMetadata = MetadataUtils.toDocumentMetadata(commonHeader, doc.getBytes());
+        DocumentMetadata documentMetadata = MetadataUtils.toDocumentMetadata(commonHeader, doc.getBytes(StandardCharsets.UTF_8));
 
         Assert.assertEquals("20070227030000", documentMetadata.getServiceStartTime());
         Assert.assertEquals(documentMetadata.getServiceStartTime(), documentMetadata.getServiceStopTime());
@@ -48,7 +49,7 @@ public class MetadataStartStopTimeTest {
     @Test
     public void testPathologyMaxDocumentStartTime() throws Exception {
         String doc = IOUtils.read(new File("src/test/resources/TestFiles/pathologyDI/PathologyResultReport_3A_Max.xml"));
-        DocumentMetadata documentMetadata = MetadataUtils.toDocumentMetadata(commonHeader, doc.getBytes());
+        DocumentMetadata documentMetadata = MetadataUtils.toDocumentMetadata(commonHeader, doc.getBytes(StandardCharsets.UTF_8));
 
         Assert.assertEquals("20140227030000", documentMetadata.getServiceStartTime());
         Assert.assertEquals(documentMetadata.getServiceStartTime(), documentMetadata.getServiceStopTime());
@@ -58,7 +59,7 @@ public class MetadataStartStopTimeTest {
     @Test
     public void testDIMinDocumentStartTime() throws Exception {
         String doc = IOUtils.read(new File("src/test/resources/TestFiles/pathologyDI/DiagnosticImagingReport_3A_Min.xml"));
-        DocumentMetadata documentMetadata = MetadataUtils.toDocumentMetadata(commonHeader, doc.getBytes());
+        DocumentMetadata documentMetadata = MetadataUtils.toDocumentMetadata(commonHeader, doc.getBytes(StandardCharsets.UTF_8));
 
         //this document has not image time, start time, or fixed time  value should be creation time
         Assert.assertEquals(documentMetadata.getCreationTime(), documentMetadata.getServiceStartTime());
@@ -68,7 +69,7 @@ public class MetadataStartStopTimeTest {
     @Test
     public void testDIMaxDocumentStartTime() throws Exception {
         String doc = IOUtils.read(new File("src/test/resources/TestFiles/pathologyDI/DiagnosticImagingReport_3A_Max.xml"));
-        DocumentMetadata documentMetadata = MetadataUtils.toDocumentMetadata(commonHeader, doc.getBytes());
+        DocumentMetadata documentMetadata = MetadataUtils.toDocumentMetadata(commonHeader, doc.getBytes(StandardCharsets.UTF_8));
 
         // this datetime has rolled back to the previous day because of +10 timezone conversion to utc
         Assert.assertEquals("20140930223702", documentMetadata.getServiceStartTime());
