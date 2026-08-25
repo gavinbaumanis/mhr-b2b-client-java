@@ -28,92 +28,53 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 /**
- * An example class showing usage of the Get Representative List web service
- *  */
-public class GetRepresentativeListSample {
+ * An example class showing usage of the Get Representative List web service client.
+ */
+public final class GetRepresentativeListSample {
 
+    private GetRepresentativeListSample() {
+    }
 
-           }
-        
-
-        
     public static void main(String[] args) throws IOException, GeneralSecurityException, StandardErrorMsg {
 
-
-                
         GetRepresentativeListClient client;
 
-
-                
         // Sets the newly created sslsocketfactory as the default for all instances of the HttpsURLConnection class.
-        SSLSocketFactory sslSocketFactory = SecurityUtil.getSsl
-                // ocketFactory();
-                
-        // For testing purpos
+        SSLSocketFactory sslSocketFactory = SecurityUtil.getSslSocketFactory();
 
-                
-                
+        // For testing purposes.
         System.setProperty("sun.security.ssl.allowUnsafeRenegotiation", "true");
 
-        // Ins
-
-                lient, providing:
-                
-                 
+        // Instantiate client, providing:
         //
-        
-                ke factory;
-                     * endpoint URI string; and
-        //  
-                ging on/off.
-        client = new GetR
-                                Client(
-             
-                                ry,
-                Sec
-                                ificate(),
-       
-                                Util.getPrivateKey(),
-              
-                                .GET_R
-
-                VE _LIST,
-                true);
-                
-
-
-                
-
-        //allow SSL connections to be set on a per client basis
-   
-                nt.setProperty(JAXWSProperties.SSL_SOCKET_FACTORY, 
-                                
-                                
-                                
-
-        // Create a 
-                                g helper method.
-                                er.User user = MessageComponents.cre
-
-                            SampleValues.USER_ID_TYPE,
-                         SampleValues.USER_ID,
-                SampleVal
-                                
-                Sam
-                                ME,
-      
-                                alues.USER_USE_ROLE_FOR_AUDIT
-                                
+        //  * socket factory;
+        //  * endpoint URI string; and
+        //  * set logging on/off.
+        client = new GetRepresentativeListClient(
+                sslSocketFactory,
+                SecurityUtil.getCertificate(),
+                SecurityUtil.getPrivateKey(),
+                SampleEndpoints.GET_REPRESENTATIVE_LIST,
+                true
         );
 
+        //allow SSL connections to be set on a per client basis
+        client.setProperty(JAXWSProperties.SSL_SOCKET_FACTORY, sslSocketFactory);
 
-                
-        // Create a sample product type,
-                lper method.
-        MHRHeader.ProductType productType = MessageComponents.
-                                   SampleValues.PRODUCT_TYPE_VENDOR,
-                                      SampleValues.PRODUCT_NAME,
-                                          SampleValues.PRODUCT_VERSION,
+        // Create a sample user, using helper method.
+        MHRHeader.User user = MessageComponents.createUser(
+                SampleValues.USER_ID_TYPE,
+                SampleValues.USER_ID,
+                SampleValues.USER_ROLE,
+                SampleValues.USER_NAME,
+                SampleValues.USER_USE_ROLE_FOR_AUDIT
+        );
+
+        // Create a sample product type, using helper method.
+        MHRHeader.ProductType productType = MessageComponents.createProductType(
+                SampleValues.PRODUCT_TYPE_VENDOR,
+                SampleValues.PRODUCT_NAME,
+                SampleValues.PRODUCT_VERSION,
                 SampleValues.PRODUCT_PLATFORM
         );
 

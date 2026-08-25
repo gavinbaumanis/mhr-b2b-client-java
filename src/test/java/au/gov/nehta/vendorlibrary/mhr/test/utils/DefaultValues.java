@@ -14,7 +14,7 @@ public class DefaultValues {
     public static final String IHI_NUMBER = "8003600300001119";
     public static final String VENDOR = "Vendor X";
     public static final String PRODUCT_NAME = "Product Name";
-    public static final String PRODUCT_VERSION = "Version 17.0.0";
+    public static final String PRODUCT_VERSION = "Version 21.0.0";
     public static final String PLATFORM = "Platform X";
     public static final MHRHeader.ClientSystemType CLIENT_SYSTEM_TYPE = MHRHeader.ClientSystemType.CPP;
     public static final String ORGANISATION_ID = "8003620000020052";

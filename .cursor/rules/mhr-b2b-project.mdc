@@ -1,9 +1,9 @@
 ---
-description: MHR B2B client scope, WSDL policy, Java 17 Jakarta build
+description: MHR B2B client scope, WSDL policy, Java 21 Jakarta build
 alwaysApply: true
 ---
 
-# mhr-b2b-client-java (Java 17 / Jakarta)
+# mhr-b2b-client-java (Java 21 / Jakarta)
 
 My Health Record **PCEHR B2B** client - **not** Healthcare Identifiers (HI). Do **not** reference **`myhr-b2b-client-java`** or other aggregator/unified client projects in docs or comments. End-user docs: **`README.md`**, **`ADHA-THIRD-PARTY-SCOPE.md`**, **`MAINTAINERS.md`**. Agent WSDL/facade matrix: **`.cursor/WSDL-CLIENT-PURPOSES.md`** (gitignored).
 
@@ -11,9 +11,9 @@ My Health Record **PCEHR B2B** client - **not** Healthcare Identifiers (HI). Do 
 
 | Version    | Java | APIs    | Facades                                                 |
 | ---------- | ---- | ------- | ------------------------------------------------------- |
-| **17.0.0** | 17   | Jakarta | **15** (12 WSDLs; three WSDLs each used by two facades) |
+| **21.0.0** | 21   | Jakarta | **15** (12 WSDLs; three WSDLs each used by two facades) |
 
-**This checkout:** **`17.0.0-SNAPSHOT`** - sibling **`au.gov.nehta`** libs at **`${project.version}`**; Java **17** / **Jakarta** XML APIs.
+**This checkout:** **`21.0.0-SNAPSHOT`** - sibling **`au.gov.nehta`** libs at **`${project.version}`**; Java **21** / **Jakarta** XML APIs.
 
 ## WSDL/XSD (committed in Git)
 
@@ -21,7 +21,7 @@ PCEHR B2B WSDL/XSD under `wsdls/src/main/resources/` are **not** separate ADHA-l
 
 ## Build
 
-- JDK **17**: install sibling **`au.gov.nehta`** libs at the same version, then `mvn -B "-Dgpg.skip=true" clean verify`
+- JDK **21**: install sibling **`au.gov.nehta`** libs at the same version, then `mvn -B "-Dgpg.skip=true" clean verify`
 - JAX-WS: **`com.sun.xml.ws:jaxws-rt` 4.0.5** - not legacy Metro **`webservices-*`**
 - Enforcer bans Metro **`webservices-*`** and legacy **`javax.xml.ws`**, **`javax.xml.bind`**, and **`javax.xml.soap`**
 - Default Surefire: offline tests; **`-Pintegration`** for mutual-TLS suite

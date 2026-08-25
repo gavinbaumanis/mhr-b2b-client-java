@@ -1,5 +1,19 @@
 # Change Log/Revision History
 
+# = 21.0.0 =
+
+- Maven **`au.gov.nehta:mhr-b2b-client`** **21.0.0** (Java **21** / **Jakarta**, **15** facades). The first number of the Maven version is the targeted Java SE version. Pair with **`au.gov.nehta:mhr-wsdl`** at the same coordinate.
+- Sibling libs **`common-library`**, **`smi-xsp`**, and **`smi-common-utils`** at **`${project.version}`** (**21.0.0**).
+- Java packages and types use **`mhr`** names (`vendorlibrary.mhr`, **`DoesMHRExistClient`**, **`MHRHeader`**, **`RegisterMHRClient`**). SOAP namespaces and element names remain the B2B **`pcehr`** wire contract (**`PCEHRHeader`**, **`registerPCEHR`**).
+- Runtime: **`com.sun.xml.ws:jaxws-rt` 4.0.5**. **`maven-enforcer-plugin`** bans Metro **`webservices-*`** and legacy **`javax.xml.ws`**, **`javax.xml.bind`**, and **`javax.xml.soap`** APIs.
+- Default package is a thin JAR; optional **`-Pfat-jar`** attaches classifier **`all`**.
+- Javadoc: **`doclint=none`**, **`failOnWarnings=false`** (same as other Java **21** sibling lines).
+- Offline Metadata unit tests encode CDA fixtures with **`StandardCharsets.UTF_8`** so Windows platform encoding does not break UTF-8 BOM XML after **`smi-common-utils`** **`IOUtils.read`**.
+- POM: Sonatype Central Portal (**`central-publishing-maven-plugin`**; server id **`central`**).
+- Offline smoke tests: **`JaxwsRuntimeSmokeTest`**, **`MhrWsdlArtifactSmokeTest`** (loads **`MHRProfileService`**), **`MhrFacadeCoverageTest`** (15 facades / 12 services / getView **7** views vs **mhr-b2b-client-dotnet**).
+- Restored corrupted **`src/sample/.../GetRepresentativeListSample.java`** so **`-Psample`** compile succeeds.
+- Documentation: README, CONTRIBUTING, MAINTAINERS, SECURITY, **ADHA-THIRD-PARTY-SCOPE.md**.
+
 # = 17.0.0 =
 
 - Maven **`au.gov.nehta:mhr-b2b-client`** **17.0.0** (Java **17** / **Jakarta**, **15** facades). The first number of the Maven version is the targeted Java SE version. Pair with **`au.gov.nehta:mhr-wsdl`** at the same coordinate.

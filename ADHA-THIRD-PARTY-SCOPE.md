@@ -1,6 +1,6 @@
 # Third-party B2B scope
 
-This library (**`au.gov.nehta:mhr-b2b-client`**, Maven line **17.0.0**, Java **17** / **Jakarta**) implements the **vendor-facing My Health Record B2B** interfaces listed by **mhr-b2b-client-dotnet** (logical names below). Wire SOAP still uses published **`pcehr`** namespaces and operation names; Java packages and type names use **`mhr`**.
+This library (**`au.gov.nehta:mhr-b2b-client`**, Maven line **21.0.0**, Java **21** / **Jakarta**) implements the **vendor-facing My Health Record B2B** interfaces listed by **mhr-b2b-client-dotnet** (logical names below). Wire SOAP still uses published **`pcehr`** namespaces and operation names; Java packages and type names use **`mhr`**.
 
 ## In scope (full)
 
