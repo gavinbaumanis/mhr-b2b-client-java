@@ -1,319 +1,112 @@
-# Maintainer guide (mhr-b2b-client-java)
+# Maintainer notes
 
-Audience: maintainers changing the build, WSDL/bindings layout, dependency coordinates,
-generated types, client facades, or tests. Integrators use README.md and published Javadoc.
-Contributors start with CONTRIBUTING.md.
+**Audience:** people changing the **`mhr-b2b-client`** build, dependency coordinates, tests, or WSDL layout - not library integrators. Integrators should use **README.md**, published Javadoc, and **`pom.xml`** coordinates.
 
-This document uses relative paths from the project root (the directory that contains
-pom.xml).
+Paths are relative to the repository root (directory containing **`pom.xml`**). This Git repository is **`mhr-b2b-client-java`**; the Maven artifact id remains **`mhr-b2b-client`**.
 
----
+## Versioning
 
-## 1. What this artifact is
+The **first number** of **`<version>`** is the **Java SE** target of **this** client JAR.
 
-Maven coordinates: au.gov.nehta:mhr-b2b-client
+| Maven version | Java SE |
+| ------------- | ------- |
+| **11.0.0**    | **11**  |
+| **17.0.0.1**  | **17**  |
+| **21.0.0.1**  | **21**  |
+| **24.0.0.1**  | **24**  |
 
-Java library for Australia's My Health Record (PCEHR) B2B SOAP services: record access,
-registration, document exchange (including MTOM), views, and templates. It is separate
-from the Healthcare Identifiers (HI) client in the sibling hi-b2b-client-java repository.
-Applications that need both depend on two JARs.
+**Documentation convention:** README, CONTRIBUTING, CHANGELOG, and integrator-facing text use **version numbers only** - never Git branch names.
 
-Published artifact: compiled facades and helpers. PCEHR WSDL/XSD are tracked in Git for
-builds (not HI-style licensed material) but excluded from the published JAR (maven-jar-plugin excludes *.wsdl).
+| Version      | Java | XML APIs                  | Facades          |
+| ------------ | ---- | ------------------------- | ---------------- |
+| **11.0.0**   | 11   | **Jakarta** XML WS / Bind | **15** (MHR B2B) |
+| **17.0.0.1** | 17   | **Jakarta** XML WS / Bind | **15** (MHR B2B) |
+| **21.0.0.1** | 21   | **Jakarta** XML WS / Bind | **15** (MHR B2B) |
+| **24.0.0.1** | 24   | **Jakarta** XML WS / Bind | **15** (MHR B2B) |
 
----
+**Git branch mapping (maintainers / checkout only - do not use in integrator docs):**
 
-## 2. Repository layout
+| Version      | Official Git branch |
+| ------------ | ------------------- |
+| **11.0.0**   | `java-11`           |
+| **17.0.0.1** | `java-17`           |
+| **21.0.0.1** | `java-21`           |
+| **24.0.0.1** | `java-24`           |
 
-| Path | Role |
-| ---- | ---- |
-| pom.xml | Build, profiles, dependency versions (`pcehr-compiled-wsdl` at `${pcehr.wsdl.version}`) |
-| src/main/java/au/gov/nehta/vendorlibrary/pcehr/clients/ | Public PCEHR client facades |
-| src/main/java/au/gov/nehta/vendorlibrary/ws/ | Shared JAX-WS helpers |
-| src/main/java/au/gov/nehta/common/utils/ | Vendored ArgumentUtils (duplicate excluded in fat-jar) |
-| src/main/java/META-INF/metro.xml | JAX-WS RI tubeline config (not a separate Metro Maven bundle) |
-| src/sample/java/ | Sample programs (`-Psample`; restored from `java-8-javax` with Jakarta imports) |
-| src/test/java/ | Offline unit tests and historical integration tests |
-| src/test/resources/TestFiles/ | CDA/XML fixtures for metadata unit tests |
-| wsdls/src/main/resources/wsdl/External/ | B2B_*.wsdl (tracked) |
-| wsdls/src/main/resources/schema/ | XSD includes |
-| wsdls/src/main/resources/binding/ | GlobalBindings.jxb, PCEHR_CommonTypes.xsd.jxb, per-WSDL *.jxb |
-| wsdls/src/main/java/ | DateAdapter; **pcehr_override/org/w3/** hand-written xmldsig types (used by **pcehr-compiled-wsdl-java**) |
-| local.properties.example | Template reserved for future integration-test configuration |
-| settings.xml.example | Optional Maven settings template: commented Central Portal deploy credentials (copy to gitignored **settings.xml**) |
-| build.ps1, build.sh, build.bat | Thin wrappers around **mvn clean verify**; **wsimport** / **shaded** args |
-| .github/workflows/ci.yml | **verify** (default) and **wsimport** jobs; installs **pcehr-compiled-wsdl-java** first |
+Artifact id stays **`mhr-b2b-client`**; the version distinguishes the Java SE line. Pair **`mhr-wsdl`** at the **same** version and the **same** branch names on the matching types repository.
 
-Branch model (maintainer-only): **`java-11-jakarta-full-wsdl`** — JDK **11**, Jakarta XML Web Services, **`jaxws-rt` 4.0.4**, **26** facades. Compile against **`au.gov.nehta:pcehr-compiled-wsdl`** at **`${pcehr.wsdl.version}`** = **`${project.version}`** (**`1.7.1-SNAPSHOT`** during dev); install matching **`pcehr-compiled-wsdl-java`** first.
+On a given branch, **do not change the first number** of **`<version>`**. A new Java SE target is a **new branch**, not a bump on this one.
 
----
+**This checkout (`11.0.0-SNAPSHOT`):** Java **11**, **Jakarta** facade clients, **`au.gov.nehta:mhr-wsdl`** at **`${project.version}`**, **15** facades (no **`wsimport`** in the default lifecycle). Stack and **`.github/workflows/ci.yml`** (branch **`java-11`**, JDK **11**, checkout **`mhr-wsdl-java`** **`java-11`**) below apply to **this line only**.
 
-## 3. Client library design
+Java packages and type names use **`mhr`**. SOAP/XML namespaces, element names, and operation names stay the published B2B contract (**`PCEHRHeader`**, **`registerPCEHR`**, **`/pcehr/`** namespace URIs).
 
-### 3.1 Layering
+## Artifact
 
-```
-  Application
-       |
-  au.gov.nehta.vendorlibrary.pcehr.clients.*Client  (facade per B2B service)
-       |
-  Client<PortType>  (abstract base)
-       |
-  Generated JAX-WS Service / Port types  (au.net.electronichealth.*, oasis names, etc.)
-       |
-  WebServiceClientUtil  (port creation, endpoint, TLS, optional WS-Addressing)
-       |
-  JAX-WS RI (jaxws-rt) over HTTPS mutual TLS
-```
+- **`au.gov.nehta:mhr-b2b-client`** - facade clients, TLS, signing.
+- Types and classpath WSDL come from **[mhr-wsdl-java](https://github.com/AuDigitalHealth/mhr-wsdl-java)**.
 
-- **Client** constructor validates inputs, builds SecurityHandler (SOAP signing via
-  smi-xsp), LoggingHandler, and optional IMTOMHandler for MTOM uploads.
-- **WebServiceClientUtil** loads generated Service classes from **`pcehr-compiled-wsdl`**
-  (wsdlLocation metadata from that artifact). Integrators pass the HTTPS endpoint URL into
-  the facade constructor.
-- **CommonHeaderValidator** validates PCEHRHeader before requests (use requireNonEmpty
-  for strings; commons-lang3 3.14+ throws NullPointerException from Validate.notEmpty on
-  null CharSequence).
-- **MetadataUtils**, **XDSFactory**, **XDSMapper** implement XDS metadata and document
-  packaging helpers using **pcehr-compiled-wsdl** RIM/XDS types (e.g. `getSlots()`,
-  `getClassifications()`, `Slot`, `RetrieveDocumentSetRequest`).
+## Layout
 
-### 3.2 Facade inventory (15 classes + Client base)
+| Path                                            | Role                                                                            |
+| ----------------------------------------------- | ------------------------------------------------------------------------------- |
+| `src/main/java/au/gov/nehta/vendorlibrary/mhr/` | Facade clients                                                                  |
+| `wsdls/`                                        | Canonical PCEHR B2B WSDL/XSD tree (kept in Git; not HI-style licensed material) |
+| `src/sample/java/`                              | Sample sources (**`-Psample`**)                                                 |
+| `src/test/java/`                                | Offline unit tests; **`-Pintegration`** widens Surefire                         |
 
-| Package | Class | Primary WSDL |
-| ------- | ----- | ------------------------ |
-| recordaccess/ | DoesPCEHRExistClient, GainPCEHRAccessClient | B2B_PCEHRProfile |
-| registration/ | RegisterPCEHRClient | B2B_RegisterPCEHR |
-| documentexchange/ | UploadDocumentClient, GetDocumentClient, UploadDocumentMetadataClient, RemoveDocumentClient | B2B_DocumentRepository, B2B_DocumentRegistry, B2B_RemoveDocument |
-| view/ | GetDocumentListClient, GetViewClient, GetAuditViewClient, GetChangeHistoryViewClient, GetIndividualDetailsViewClient, GetRepresentativeListClient | `B2B_GetView` (7 third-party types), `B2B_GetAuditView`, `B2B_GetChangeHistoryView`, `B2B_GetIndividualDetailsView`, `B2B_GetRepresentativeList`; `GetDocumentListClient` uses `B2B_DocumentRegistry`. See **`ADHA-THIRD-PARTY-SCOPE.md`**. Offline: **`ViewClientsSmokeTest`**; integration: `tests/view/*`, **`TestGetView`**. |
-| template/ | GetTemplateClient, SearchTemplateClient | B2B_GetTemplate, B2B_SearchTemplate |
+See **`wsdls/readme.txt`**.
 
-GainPCEHRAccess authorisation accessType is a String enum value ("AccessCode",
-"EmergencyAccess"), not a nested AccessType enum.
+## Java / JAX stack (`11.0.0`)
 
-PCEHRHeader may carry an IHI resolved via the HI client in integrator applications; this
-repo does not embed HI WSDL.
+- **`maven.compiler.release` 11**
+- **`ee4j.jaxws.version`** - **`com.sun.xml.ws:jaxws-rt`** **4.0.5**. Exclude legacy **`webservices-rt`** from **`common-library`** and **`clinical-document-packaging-library`**.
+- **`mhr.wsdl.version`** - **`${project.version}`**; coordinate GA releases with **`mhr-wsdl-java`**.
+- **`maven-enforcer-plugin`:** bans Metro **`webservices-*`** and legacy **`javax.xml.ws`**, **`javax.xml.bind`**, and **`javax.xml.soap`** APIs. Application code uses **Jakarta** XML APIs.
+- **`maven-gpg-plugin`:** skipped unless **`-Dgpg.skip=false`**
+- **`maven-javadoc-plugin`:** **`doclint=all`**, **`failOnWarnings=true`**
+- **`.github/workflows/ci.yml`:** GitHub Actions on **`java-11`**, JDK **11**; installs **`mhr-wsdl`** **`11.0.0-SNAPSHOT`** then **`verify`**
 
-**GetView:** seven view types (see **`ADHA-THIRD-PARTY-SCOPE.md`**). Use HRO `versionNumber` `"1.1"` in samples and tests.
+## Default tests
 
-### 3.3 Runtime requirements (integrator view)
+Surefire default **`includes`** run offline-safe tests only (**`JaxwsRuntimeSmokeTest`**, **`MhrWsdlArtifactSmokeTest`**, and other unit tests). **`MhrWsdlArtifactSmokeTest`** loads **`au.net.electronichealth.ns.mhr.b2b.svc.mhrprofile._1.MHRProfileService`**. **`integration`** profile widens to **`**/\*Test.java`\*\* for mutual-TLS suites with local keystores.
 
-Every call expects:
+## Optional `wsdls/` Ant wsimport
 
-- HTTPS endpoint URL
-- SSLSocketFactory for mutual TLS
-- X509 certificate and private key for SOAP message signing
-- CertificateValidator (smi-xsp)
-- Populated PCEHRHeader (user, product, clientSystemType; optional accessing organisation)
+The default **`mhr-b2b-client`** build uses **`mhr-wsdl`** from Maven. To regenerate SOAP types locally:
 
-MTOM clients use a separate constructor path on Client with IMTOMHandler.
-
-### 3.4 Compile/runtime dependencies (published JAR)
-
-| Dependency | Purpose |
-| ---------- | ------- |
-| au.gov.nehta:smi-xsp | XML-DSig, certificate validation |
-| com.sun.xml.ws:jaxws-rt | Jakarta XML Web Services RI |
-| org.apache.commons:commons-lang3 | Validate and String utilities in facades |
-| commons-io | IO helpers in document/metadata utilities |
-
-Test-only: junit, clinical-document-packaging-library, esignature, contiperf, jaxb-api.
-Do not add compile dependencies on legacy Metro webservices-rt or javax.xml webservices-api.
-
-Vendored code (no separate Maven deps): au.gov.nehta.common.utils, parts of
-au.gov.nehta.vendorlibrary.ws duplicated from HI-style layout.
-
----
-
-## 4. Build process design
-
-### 4.1 Goals
-
-1. Compile facades against **`au.gov.nehta:pcehr-compiled-wsdl`** at **`${pcehr.wsdl.version}`** (main dependency; all profiles).
-2. Optional **`-Pwsimport`**: validate in-repo wsimport without putting generated sources on the compile classpath.
-3. Exclude *.wsdl from the published mhr-b2b-client JAR.
-4. Default test run: offline unit tests only; full historical suite via **`-Pintegration`**.
-
-### 4.2 Lifecycle (Maven phases)
-
-```
-validate / initialize
-  enforcer: require-pcehr-wsdl-tree  -> wsdls/src/main/resources/wsdl/External/B2B_PCEHRProfile.wsdl
-
-[-Pwsimport only]
-  initialize: purge prior wsimport output
-  generate-sources: jaxws-maven-plugin (12 B2B wsimport executions)
-  process-sources: GMavenPlus merge -> target/generated-sources/wsimport (not compiled)
-
-compile / test / package  (types from pcehr-compiled-wsdl in both profiles)
-  compiler (default testIncludes: offline unit tests + sample/common helpers)
-  surefire (default includes: same offline set)
-  jar (WSDL excluded), optional gpg/javadoc/source attachments
+```text
+cd wsdls
+./sync-lib.ps1                    # or: mvn -B -f ee4j-jaxws-lib-pom.xml package
+ant -f build.xml generate-src
 ```
 
-SOAP/JAXB types come from **`au.gov.nehta:pcehr-compiled-wsdl`** (main **`pom.xml`** dependency). Install **`pcehr-compiled-wsdl-java`** at **`${project.version}`** before building. Regenerate that artifact from the WSDL tree under **`wsdls/src/main/resources/`** when schemas or bindings change.
+Tooling lives in **`wsdls/lib/provided/`** (**`jaxws-tools`**, **`jaxws-rt`**, **`ant-contrib`** from Maven Central - **not** legacy Metro **`webservices-*`**). Keep updated JARs in Git after **`sync-lib`**. **`ee4j.jaxws.version`** in **`ee4j-jaxws-lib-pom.xml`** must match the root **`pom.xml`**.
 
-**Optional (`-Pwsimport`):** runs the same **12** `jaxws-maven-plugin` executions as **`pcehr-compiled-wsdl-java`**, merges output under **`target/generated-sources/wsimport`** (validation / diff only — **not** on the compile classpath).
+**`WsdlsCodegenToolingTest`** (default Surefire) checks tooling JARs, WSDL tree presence, version alignment, and absence of Metro **`webservices-*`** filenames - no Ant run in CI.
 
-```bash
-mvn -B -Dgpg.skip=true clean verify              # default
-mvn -B -Dgpg.skip=true -Pwsimport clean verify   # + wsimport validation (~50s)
-```
+## Contributors vs release publisher (`pom.xml`)
 
-Requires **`pcehr-compiled-wsdl`** installed locally at **`${project.version}`**.
+**Contributors (PRs, ordinary changes):** Do not change **`<version>`** (stay on **`-SNAPSHOT`** unless the maintainer requests a bump), **`<scm><tag>`**, or **`distributionManagement`**. If a maintainer requests a SNAPSHOT bump on this branch, change only the trailing numbers (**`8.0.1-SNAPSHOT`**), never the Java SE digit. Leave **`maven-gpg-plugin`** **`skip`** **`true`** so default **`mvn verify`** does not require a signing key. Record user-visible work under **`CHANGELOG.md`** in the **`= <pom-version> =`** block that matches **`pom.xml`** **`<version>`**.
 
-### 4.3 Key Maven properties (pom.xml)
+**Release publisher:** In the release change set: set **`<version>`** to the GA coordinate (no **`-SNAPSHOT`**); set **`<scm><tag>`** to the Git tag you will publish (match existing tag naming). Move **`CHANGELOG.md`** bullets from the snapshot section into a new **`= <GA-version> =`** section; add a fresh **`-SNAPSHOT`** block for the next development cycle. Deploy via Sonatype Central Portal (**`central-publishing-maven-plugin`**; copy **`settings.xml.example`** -> **`settings.xml`**, server id **`central`**). See **Release** below.
 
-| Property | Default / role |
-| -------- | -------------- |
-| maven.compiler.release | 11 |
-| jaxws.rt.version | jaxws-rt and jaxws-tools (4.0.4) |
-| mhr.wsdl.dir | Reference WSDL sentinel path for enforcer |
-| mhr.wsdl.codegen.skip | **true** (default); **false** when **`-Pwsimport`** |
-| mhr.wsdl.resources.root | WSDL/XSD root; override via **`-Dmhr.wsdl.resources.root`** or **`MHR_WSDL_RESOURCES_ROOT`** |
-| jaxws.maven.plugin.version / jaxb.xjc.version | wsimport profile only (4.0.2 / 4.0.7) |
-| pcehr.wsdl.version | ${project.version}; **`au.gov.nehta:pcehr-compiled-wsdl`** coordinate |
-| maven.shade.plugin.version | fat-jar profile |
-| skipTests | false; default surefire includes offline unit tests only |
+## Release
 
-### 4.4 Profiles
+Publishing uses **`central-publishing-maven-plugin`** (Sonatype Central Portal). Copy **`settings.xml.example`** -> **`settings.xml`**, server id **`central`**.
 
-| Profile | Effect |
-| ------- | ------ |
-| wsimport | In-repo **12**-execution wsimport validation (see §4.2); compile still uses main **`pcehr-compiled-wsdl`** dependency |
-| integration | Clears compiler **testIncludes**; Surefire runs **/*Test.java (needs endpoints, certs; see section 5) |
-| sample | Adds src/sample/java at generate-sources |
-| fat-jar | maven-shade-plugin produces mhr-b2b-client-*-all.jar; excludes duplicate ArgumentUtils from smi-xsp |
+**Parallel release lines (maintainers only):** each Git branch of **this** repository publishes a **different Maven version** of **`mhr-b2b-client`**. Integrators choose by coordinate, not branch name. The first number of that version is the targeted Java SE version. Run **`release:prepare` / `release:perform`** (or manual deploy) **on that branch** (not detached HEAD).
 
-Build wrappers: mvn -B -Dgpg.skip=true clean verify; pass shaded for fat-jar.
+| Branch        | Java         | `mhr-b2b-client` / `mhr-wsdl` | Facades |
+| ------------- | ------------ | ----------------------------- | ------- |
+| **`java-11`** | 11 / Jakarta | **11.0.0**                    | 15      |
+| **`java-17`** | 17 / Jakarta | **17.0.0.1**                  | 15      |
+| **`java-21`** | 21 / Jakarta | **21.0.0.1**                  | 15      |
+| **`java-24`** | 24 / Jakarta | **24.0.0.1**                  | 15      |
 
----
+**Order:** publish **`mhr-wsdl`** first. This client cannot complete **`verify`** / **`release:perform`** until that coordinate is on Central (or installed locally).
 
-## 5. External inputs and local configuration
-
-### 5.1 WSDL/XSD in Git
-
-Unlike HI, the PCEHR WSDL tree under wsdls/src/main/resources is tracked. Maintainers
-update it when ADHA releases new contract versions. The enforcer sentinel is
-wsdls/src/main/resources/wsdl/External/B2B_PCEHRProfile.wsdl (via ${mhr.wsdl.dir}).
-
-### 5.2 local.properties
-
-Copy local.properties.example to local.properties beside the JVM working directory
-(gitignored).
-
-Today: placeholder MHR_* keys for a future TestConfiguration-style layer (keystore,
-truststore, endpoint base). Integration tests still read endpoint and certificate
-constants from src/test/java utilities (for example Endpoints.java, SecurityConstants.java,
-SampleEndpoints.java in sample code).
-
-**Do not commit:** populated local.properties, certs/, real keystores, passwords, or
-production endpoint URLs.
-
-Planned alignment with hi-b2b-client-java: environment variable overrides
-local.properties overrides test defaults.
-
-### 5.3 settings.xml
-
-Copy **`settings.xml.example`** to **`settings.xml`** at the repository root (or merge the commented **`<servers>`** block into your Maven user settings file). Server id **`central`** must match **`distributionManagement`** in **`pom.xml`**. Generate a Sonatype user token at https://central.sonatype.com/
-
-**`build.ps1`** / **`build.sh`** honour **`MVN_SETTINGS`** when set. Do not commit populated **`settings.xml`** with tokens.
-
-### 5.4 Integration test material
-
-Historical tests under src/test/java call cert-environment endpoints configured in test
-helper classes. They require mutual-TLS keystores (often under src/test/resources/security/
-or paths in test code), truststores, and valid registration metadata.
-
-Keep secrets in gitignored files or CI secret stores, not in source.
-
-### 5.5 Test fixtures
-
-Metadata unit tests load XML via IOUtils.readBytes from src/test/resources/TestFiles/.
-Use readBytes (UTF-8 file bytes), not String.getBytes() without a charset, so Windows
-default charset does not corrupt CDA input.
-
----
-
-## 6. Tests (maintainer view)
-
-| Command | Scope |
-| ------- | ----- |
-| mvn -B "-Dgpg.skip=true" test | Default offline unit tests (pom.xml surefire includes) |
-| mvn -B "-Dgpg.skip=true" -Pintegration test | All *Test.java; needs live/cert endpoints and TLS material |
-
-Default includes (45 tests): ArgumentUtilsTest, CommonHeaderValidatorTest, DateUtilsTest,
-MetadataStartStopTimeTest, MetadataUtilsDefaultLangTest, MetadataUtilsOrgIDNameTest,
-MetadataUtilsTimeTest, OIDUtilTest, PcehrWsdlArtifactSmokeTest, ViewClientsSmokeTest.
-
-`unittests/views/GetRepresentativeListClientTest` is a mutual-TLS integration test (not in default includes); run with **`-Pintegration`**.
-
-Default **test-compile** uses the same offline set (plus `src/test/java/.../sample/common`
-helpers). **`-Pintegration`** compiles all tests under `src/test/java`.
-
----
-
-## 7. JAXB / hand-written XDS notes
-
-- **Compile classpath:** types from **pcehr-compiled-wsdl** (JAXB 2.x-style plural list accessors).
-- **GlobalBindings.jxb:** DateAdapter for `xsd:date` → `java.util.Calendar`; optional **rim.xsd.jxb** / **XDS_DocumentRepository.xsd.jxb** for in-repo wsimport experiments.
-- In-repo wsimport (Jakarta XJC 4.x) may emit different accessor names; **`-Pwsimport`** validates codegen but does not replace **pcehr-compiled-wsdl** on the compile classpath.
-- DateUtils.toUtcDate: positive timezone offsets use operator "+" (required for
-  findTimeZonePatternByLength validation).
-
----
-
-## 8. Common maintainer tasks
-
-**Add a B2B WSDL and facade**
-
-1. Add WSDL (and XSD deltas) under wsdls/src/main/resources.
-2. Add binding file under wsdls/src/main/resources/binding/ if needed.
-3. Regenerate and install **pcehr-compiled-wsdl-java** at the matching version.
-4. Implement facade extending Client under the appropriate package.
-5. Add unit and/or integration tests.
-
-**Bump commons-lang3**
-
-Validate.notEmpty on null strings throws NullPointerException in 3.14+. Prefer explicit
-null/empty checks throwing IllegalArgumentException where tests expect IAE (see
-CommonHeaderValidator.requireNonEmpty).
-
-**Bump jaxws-rt**
-
-Update property, reinstall **pcehr-compiled-wsdl-java**, then `mvn clean verify` here.
-
-**target/ locked**
-
-Same as CONTRIBUTING.md (maven-clean-plugin force/retry; manual delete if needed).
-
----
-
-## 9. Public release checklist
-
-Before tagging or publishing to a public Git host:
-
-1. **No secrets** in the tree (keystores, passwords, production URLs with credentials). See **SECURITY.md**.
-2. Install **`pcehr-compiled-wsdl-java`** at **`${project.version}`**; run **`mvn -B "-Dgpg.skip=true" clean verify`** (default WSDL JAR build).
-3. Run **`mvn -B "-Dgpg.skip=true" -Pwsimport clean verify`** (in-repo wsimport validation).
-4. Confirm **`.github/workflows/ci.yml`** passes (both **verify** and **wsimport** jobs).
-5. **LICENSE.txt**, **README.md**, **CONTRIBUTING.md**, **SECURITY.md**, **ADHA-THIRD-PARTY-SCOPE.md** current for release **`1.7.0`**.
-6. Published JAR excludes **`*.wsdl`** (maven-jar-plugin); WSDL/XSD remain in Git for reference and **pcehr-compiled-wsdl-java** regeneration.
-
-Integrators consume **`au.gov.nehta:mhr-b2b-client`** from Maven Central; they do **not** need **`-Pwsimport`**.
-
-## Release (Maven Central)
-
-Publishing uses **`central-publishing-maven-plugin`** (Sonatype Central Portal). Copy **`settings.xml.example`** → **`settings.xml`**, server id **`central`**.
-
-**Parallel release lines (maintainers only):** each Git branch publishes a **different Maven version** — integrators choose by coordinate, not branch name.
-
-| Branch | Java | MHR client / WSDL version | Facades |
-| ------ | ---- | ------------------------- | ------- |
-| **`java-8-javax-full-wsdl`** | 8 / javax | **1.6.3** | 15 |
-| **`java-11-jakarta-full-wsdl`** | 11 / Jakarta | **1.7.0** | 26 |
-
-Release **`pcehr-compiled-wsdl`** and **`mhr-b2b-client`** at the **same GA version** on the matching branch pair before integrators upgrade.
+**`-DdevelopmentVersion`:** keep the same first number as **`-DreleaseVersion`** (example on this line: **`11.0.0`** then **`11.0.1-SNAPSHOT`**).
 
 ### SNAPSHOT or manual GA
 
@@ -321,33 +114,41 @@ Release **`pcehr-compiled-wsdl`** and **`mhr-b2b-client`** at the **same GA vers
 2. **`mvn -B "-Prelease" clean verify`**
 3. **`mvn -B "-Prelease" deploy`**
 
-Git/SCM settings for **`maven-release-plugin`** live in **`pom.xml`** properties (**`scm.repo.url`**, **`release.*`**). Tags default to **`{artifactId}-{version}`** (e.g. **`mhr-b2b-client-1.7.0`**).
+Git/SCM settings for **`maven-release-plugin`** live in **`pom.xml`** properties (**`scm.repo.url`**, **`release.*`**). Tags default to **`{artifactId}-{version}`** (e.g. **`mhr-b2b-client-11.0.0`**).
 
 ### Automated GA (`maven-release-plugin`)
 
-Run on the **target branch** with a **clean** working tree. The plugin commits version bumps, creates the release tag, deploys from the tag checkout, bumps to the next **`-SNAPSHOT`**, and **pushes branch + tag** (**`pushChanges`** / **`remoteTagging`** in **`pom.xml`**). Git remote credentials (SSH or HTTPS) must work non-interactively.
+Run on the **target branch** with a **clean** working tree. The plugin bumps versions, creates the release tag, deploys from the tag checkout, bumps to the next **`-SNAPSHOT`**, and updates the remote branch and tag (**`pushChanges`** / **`remoteTagging`** in **`pom.xml`**). Git remote credentials (SSH or HTTPS) must work non-interactively.
 
 ```text
-mvn -B "-Prelease" release:prepare release:perform -DreleaseVersion=1.7.0 -DdevelopmentVersion=1.7.1-SNAPSHOT -Dtag=mhr-b2b-client-1.7.0
+mvn -B "-Prelease" release:prepare release:perform -DreleaseVersion=11.0.0 -DdevelopmentVersion=11.0.1-SNAPSHOT -Dtag=mhr-b2b-client-11.0.0
 ```
 
-Replace versions and **`-Dtag`** for the branch you are on (**`pcehr-compiled-wsdl-1.6.3`**, **`mhr-b2b-client-1.6.3`**, etc.). Omit **`-D…`** only if you accept interactive prompts.
+Replace **`-DreleaseVersion`**, **`-DdevelopmentVersion`**, and **`-Dtag`** for the branch you are on. Omit **`-D...`** only if you accept interactive prompts.
 
-**After success:** confirm the artifact on Central; repeat on the paired types/client repo. No extra Git steps unless push failed (then **`git push origin <branch>`** and **`git push origin <tag>`**).
+**After success:** confirm **`mhr-wsdl`** then **`mhr-b2b-client`** GA on Central. If the plugin did not update the remote, send the release branch and the release tag from a local checkout.
 
 **`-Dgpg.skip=false`** is equivalent to **`-Prelease`** for signing.
 
----
+## Changelog and releases
 
-## 10. Sibling project alignment
+**`CHANGELOG.md`** uses **`= version =`** section headers. Match the snapshot header to **`pom.xml`** **`<version>`** until the publisher cuts GA.
 
-Keep plugin and shared dependency versions aligned with hi-b2b-client-java (jaxws-rt,
-surefire, compiler, shade, smi-xsp). HI requires a separately installed licensed tree; MHR
-WSDL lives in wsdls/src/main/resources and is codegen’d in **pcehr-compiled-wsdl-java**.
+## New Java SE line
 
----
+When adding a line (e.g. Java **25**): create **`java-25`** in **this** repository from the nearest existing client line; set **`<version>`** first number to **25** (e.g. **`25.0.0.1-SNAPSHOT`**); set **`maven.compiler.release`**, JAX-WS / JAXB coordinates, CI **`java-version`** / branch filter, and docs to that line. Do not retarget an existing branch.
+
+The matching **`mhr-wsdl`** line must exist first.
+
+## Public remote checklist
+
+Before sending work to a **public** remote:
+
+1. **`git status`** - no keystores, **`settings.xml`**, or **`local.properties`** staged.
+2. No **`target/`** in the change set.
+3. **`mvn -B "-Dgpg.skip=true" clean verify`** passes (with **`mhr-wsdl`** installed or on Central).
+4. **CHANGELOG.md** and **`pom.xml`** version reflect the release line.
 
 ## Copyright
 
-Copyright 2012 NEHTA. Copyright 2021-2026 ADHA (Australian Digital Health Agency).
-Licensed under the Apache License, Version 2.0. See LICENSE.txt.
+Copyright 2012 NEHTA. Copyright 2021-2026 ADHA. Apache License 2.0 - see **LICENSE.txt**.

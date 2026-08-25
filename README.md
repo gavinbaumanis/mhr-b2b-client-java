@@ -1,120 +1,152 @@
 # MHR B2B Client
 
-Maven library for Australia's **My Health Record (PCEHR) B2B** SOAP APIs over **Jakarta XML Web Services** (version **`1.7.0`** on Maven Central; **`1.7.1-SNAPSHOT`** during local development).
+Maven artifact **`au.gov.nehta:mhr-b2b-client`** - Java facade clients for Australia's **My Health Record (MHR) B2B** SOAP APIs over **JAX-WS**.
 
-**Audience:** applications that depend on **`au.gov.nehta:mhr-b2b-client`**, supply mutual-TLS credentials and ADHA-registered product metadata, and call PCEHR record access, document exchange, views, and templates. To **build or change this repository**, see **`CONTRIBUTING.md`**, **`MAINTAINERS.md`**, and **`SECURITY.md`**.
+For generated types and classpath WSDL, use **[mhr-wsdl-java](https://github.com/AuDigitalHealth/mhr-wsdl-java)**. This repository supplies **facade clients**, **TLS**, and **SOAP signing**. The pairing is the same as **`hi-wsdl`** / **`hi-b2b-client`**: same Maven version, types JAR first.
 
-It provides typed client facades for:
-- record access
-- registration
-- document exchange (including MTOM)
-- views
-- templates
+**Audience:** applications that depend on **`au.gov.nehta:mhr-b2b-client`**, supply mutual-TLS credentials and ADHA-registered product metadata, and call record access, document exchange, views, and templates. To **build or change this repository**, see **`CONTRIBUTING.md`**, **`MAINTAINERS.md`**, and **`SECURITY.md`**.
 
-All service traffic uses HTTPS mutual TLS and SOAP message signing.
+Traffic uses **HTTPS with mutual TLS** and **signed** SOAP. You need ADHA registration, test or production **certificates**, and **endpoint URLs** before live calls succeed.
 
 ## Dependency
+
+Published releases are consumed from **[Maven Central](https://central.sonatype.com/)**. Use a **`<version>`** that matches your JDK (see **Versioning**).
 
 ```xml
 <dependency>
   <groupId>au.gov.nehta</groupId>
   <artifactId>mhr-b2b-client</artifactId>
-  <version>VERSION</version>
+  <version>11.0.0</version>
 </dependency>
 ```
 
-Use the published version from [Maven Central](https://central.sonatype.com/).
+**This line (`11.0.0`):** Java **11**, **Jakarta XML Web Services / JAXB**, **15** facade clients. Runtime SOAP stack is Eclipse EE4J **`com.sun.xml.ws:jaxws-rt`** **4.0.5**. Pair with **`au.gov.nehta:mhr-wsdl`** **`11.0.0`**. Do **not** use legacy Metro **`webservices-*`** bundles.
 
-## Runtime requirements
+When **`mhr-wsdl`** is also on the classpath, use the **same** Maven version for both artifacts.
 
-- **JDK 11+** (see **`maven.compiler.release`** in **`pom.xml`**)
-- Maven pulls **Eclipse EE4J `jaxws-rt` 4.x**; application code uses **`jakarta.xml.ws`**, **`jakarta.xml.bind`**, and related **`jakarta.*`** APIs — not legacy **`javax.xml.ws`** / JAXB EE APIs
-- Valid endpoint URL(s), client certificate and private key for mutual TLS, truststore, and populated **`PCEHRHeader`**
+---
 
-### Local development (SNAPSHOT)
+## Versioning
 
-Install **`pcehr-compiled-wsdl-java`** at the same Maven version (**`1.7.1-SNAPSHOT`**) before building this client:
+The **first number** of the Maven version is the **Java SE** version that this client targets. **`mhr-b2b-client`** and **`mhr-wsdl`** always use the **same** version on a given line (same SNAPSHOT or GA).
+
+| Maven version | Java SE | XML stack                               | Facades          |
+| ------------- | ------- | --------------------------------------- | ---------------- |
+| **11.0.0**    | **11**  | **Jakarta** / EE4J **`jaxws-rt` 4.0.x** | **15** (MHR B2B) |
+| **17.0.0.1**  | **17**  | **Jakarta** / EE4J **`jaxws-rt` 4.0.x** | **15** (MHR B2B) |
+| **21.0.0.1**  | **21**  | **Jakarta** / EE4J **`jaxws-rt` 4.0.x** | **15** (MHR B2B) |
+| **24.0.0.1**  | **24**  | **Jakarta** / EE4J **`jaxws-rt` 4.0.x** | **15** (MHR B2B) |
+
+Pick the coordinate that matches your JDK. Do not mix **`mhr-b2b-client`** versions with **`mhr-wsdl`** from a different line. All published versions are on **[Maven Central](https://central.sonatype.com/)**.
+
+Java packages and type names use **`mhr`** (`au.gov.nehta.vendorlibrary.mhr`, **`DoesMHRExistClient`**, **`MHRHeader`**, **`RegisterMHRClient`**). SOAP/XML namespaces, element names, and operation names stay the published B2B contract (`http://ns.electronichealth.net.au/pcehr/...`, **`PCEHRHeader`**, **`registerPCEHR`**).
+
+---
+
+## Note
+
+The **11.0.0** JAR ships **15** MHR B2B facade clients on **Jakarta**. That set matches the logical B2B interfaces in **mhr-b2b-client-dotnet** (including **getView** and its **7** clinical views). See **ADHA-THIRD-PARTY-SCOPE.md**.
+
+---
+
+## Local development (SNAPSHOT)
+
+This repository builds **`11.0.0-SNAPSHOT`**. Install unpublished **`mhr-wsdl`** **first** at the **same Maven version**, then **`verify`** here:
 
 ```text
-cd ../pcehr-compiled-wsdl-java
+# 1) mhr-wsdl-java
 mvn -B "-Dgpg.skip=true" clean install
 
-cd ../mhr-b2b-client-java
+# 2) mhr-b2b-client-java
 mvn -B "-Dgpg.skip=true" clean verify
 ```
 
-## WSDL/XSD and build profiles
+If Maven warns that a **GA** POM is missing (for example **`11.0.0`** before Central publish), clear stale **`au/gov/nehta/mhr-wsdl`** entries in your **local Maven repository** (folders with only **`.lastUpdated`** files) and reinstall the SNAPSHOT. **`mvn clean`** in this project does not clear the local repository cache.
 
-SOAP/JAXB types for compilation always come from **`au.gov.nehta:pcehr-compiled-wsdl`** (built from sibling **`pcehr-compiled-wsdl-java`**). WSDL/XSD sources are tracked under **`wsdls/src/main/resources/`**; see **`wsdls/readme.txt`**.
+---
 
-| Build | Command | What runs |
-| ----- | ------- | --------- |
-| **Default** (WSDL JAR) | `mvn clean verify` | Compiles against **`pcehr-compiled-wsdl`** only |
-| **wsimport validation** | `mvn -Pwsimport clean verify` | Same compile classpath **plus** in-repo **12**-service wsimport (output under **`target/generated-sources/wsimport`**, not compiled) |
+## WSDL/XSD
 
-Both require **`pcehr-compiled-wsdl-java`** installed at **`${project.version}`** before building (see **Local development** above). Details: **`MAINTAINERS.md`** §4.
+PCEHR B2B WSDL and XSD are committed under **`wsdls/`**. They are **not** separate ADHA-licensed artefacts (contrast with **hi-b2b-client-java** HI contracts). The published facade JAR uses generated types from **`mhr-wsdl`**; the in-repo tree is the canonical contract reference. See **`wsdls/readme.txt`**.
 
-## Available clients
+### Optional: regenerate types with Ant (maintainers)
 
-Package base: `au.gov.nehta.vendorlibrary.pcehr.clients`
+To run **`wsimport`** locally from the in-repo WSDL tree (not required for normal **`mvn verify`**):
 
-- `recordaccess`: `DoesPCEHRExistClient`, `GainPCEHRAccessClient`
-- `registration`: `RegisterPCEHRClient`
-- `documentexchange`: `UploadDocumentClient`, `GetDocumentClient`, `UploadDocumentMetadataClient`, `RemoveDocumentClient`
-- `view` (six facades; see **`ADHA-THIRD-PARTY-SCOPE.md`**):
-  - `GetViewClient` — seven third-party `getView` types (`B2B_GetView`)
-  - `GetIndividualDetailsViewClient`, `GetRepresentativeListClient`, `GetAuditViewClient`, `GetChangeHistoryViewClient`
-  - `GetDocumentListClient` — document metadata via `B2B_DocumentRegistry`
-- `template`: `GetTemplateClient`, `SearchTemplateClient`
+```text
+cd wsdls
+./sync-lib.ps1                         # refresh lib/provided if ee4j.jaxws.version changes
+ant -f build.xml generate-src          # requires Apache Ant on PATH
+```
 
-## Build from source
+Tooling under **`wsdls/lib/provided/`** is **Eclipse EE4J** (**`jaxws-tools`**, **`jaxws-rt`**) - not legacy Metro **`webservices-*`**. Offline test **`WsdlsCodegenToolingTest`** guards this layout in CI.
+
+---
+
+## What you configure in your application
+
+Construct a facade client (for example **`DoesMHRExistClient`**) with:
+
+| Item                                  | Purpose                                  |
+| ------------------------------------- | ---------------------------------------- |
+| **`SSLSocketFactory`**                | Mutual TLS to the PCEHR endpoint.        |
+| Private key + certificate             | TLS and SOAP signing.                    |
+| Endpoint URL                          | SOAP service URL from your registration. |
+| Product / vendor / user qualified IDs | Values issued for your software product. |
+
+Load keystores, truststores, and identifiers from your platform. Do not commit credentials to source control (**`SECURITY.md`**).
+
+---
+
+## Client classes
+
+Package base: **`au.gov.nehta.vendorlibrary.mhr.clients`**.
+
+| Area              | Examples                                                                                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Record access     | `DoesMHRExistClient`, `GainMHRAccessClient`                                                                                                                   |
+| Document exchange | `UploadDocumentClient`, `GetDocumentClient`, `RemoveDocumentClient`, `UploadDocumentMetadataClient`                                                           |
+| Registration      | `RegisterMHRClient`                                                                                                                                           |
+| Views             | `GetViewClient`, `GetDocumentListClient`, `GetAuditViewClient`, `GetChangeHistoryViewClient`, `GetIndividualDetailsViewClient`, `GetRepresentativeListClient` |
+| Templates         | `GetTemplateClient`, `SearchTemplateClient`                                                                                                                   |
+
+---
+
+## Build and test
+
+From the repository root (after **`mhr-wsdl`** is resolvable):
 
 ```text
 mvn -B "-Dgpg.skip=true" clean verify
 ```
 
-Or use root **`build.ps1`** / **`build.sh`** / **`build.bat`**. Options:
+- Default Surefire: **offline** unit tests only.
+- Full mutual-TLS integration suite: **`mvn -B -Pintegration "-Dgpg.skip=true" clean test`** with local keystores and endpoints configured.
+- Sample sources: **`mvn -B -Psample "-Dgpg.skip=true" -DskipTests=true clean compile`**
+- Shaded JAR (classifier **`all`**): **`mvn -B -Pfat-jar "-Dgpg.skip=true" clean verify`**
 
-| Wrapper argument | Maven profile |
-| ---------------- | ------------- |
-| *(none)* | default |
-| **`wsimport`** / **`-Wsimport`** | **`-Pwsimport`** |
-| **`shaded`** / **`-Shaded`** | **`-Pfat-jar`** (uber JAR) |
+Optional: **`./build.sh`**, **`build.ps1`**.
 
-Compile dependency: **`pcehr-compiled-wsdl`** at **`${project.version}`** (**`1.7.1-SNAPSHOT`** during development).
+---
 
-## Tests
+## Related repositories
 
-Default Surefire run (offline unit tests only, including **`ViewClientsSmokeTest`** for view SOAP types):
+| Repository                                                                  | Role                                                     |
+| --------------------------------------------------------------------------- | -------------------------------------------------------- |
+| [mhr-wsdl-java](https://github.com/AuDigitalHealth/mhr-wsdl-java)           | Generated MHR SOAP types (**11.0.0**, Java 11 / Jakarta) |
+| [hi-b2b-client-java](https://github.com/AuDigitalHealth/hi-b2b-client-java) | Healthcare Identifiers client (separate domain)          |
 
-```text
-mvn -B "-Dgpg.skip=true" test
-```
+## Documentation
 
-Full mutual-TLS integration suite (view client tests under `src/test/java/.../tests/view/` and **`TestGetView`**):
-
-```text
-mvn -B "-Dgpg.skip=true" -Pintegration test
-```
-
-## Samples
-
-Sample usage classes are under `src/sample/java`.
-
-To compile samples from a source checkout:
-
-```text
-mvn -B -Psample "-DskipTests=true" clean compile
-```
-
-## Security and public hosting
-
-Do not commit secrets, real keystores, or production endpoint credentials. **`local.properties`** is gitignored. See **`SECURITY.md`**.
-
-## ADHA third-party scope
-
-Supported third-party `getView` types: **`ADHA-THIRD-PARTY-SCOPE.md`**.
+| Document                  | Audience                        |
+| ------------------------- | ------------------------------- |
+| **README.md** (this file) | Integrators                     |
+| **CONTRIBUTING.md**       | Contributors                    |
+| **MAINTAINERS.md**        | Releases and tooling            |
+| **SECURITY.md**           | Secrets and reporting           |
+| **CHANGELOG.md**          | Release history                 |
+| **LICENSE.txt**           | Apache License 2.0 + ADHA terms |
 
 ## License
 
-Apache License 2.0. See `LICENSE.txt`.
+Apache License 2.0. See **LICENSE.txt**.

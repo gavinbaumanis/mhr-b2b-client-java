@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ master, main, java-11-jakarta-full-wsdl ]
+    branches: [ java-11 ]
   pull_request:
-    branches: [ master, main, java-11-jakarta-full-wsdl ]
+    branches: [ java-11 ]
 
 permissions:
   contents: read
@@ -13,41 +13,21 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - name: Checkout pcehr-compiled-wsdl-java
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
         with:
-          repository: ${{ github.repository_owner }}/pcehr-compiled-wsdl-java
-          ref: java-11-jakarta-full-wsdl
-          path: pcehr-compiled-wsdl-java
+          repository: AuDigitalHealth/mhr-wsdl-java
+          ref: java-11
+          path: mhr-wsdl-java
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "11"
           cache: maven
-      - name: Install pcehr-compiled-wsdl (1.7.1-SNAPSHOT)
-        working-directory: pcehr-compiled-wsdl-java
+      - name: Install mhr-wsdl (11.0.0-SNAPSHOT)
+        working-directory: mhr-wsdl-java
         run: mvn -B "-Dgpg.skip=true" clean install -DskipTests
-      - name: Maven verify (default)
+      - name: Maven verify
         run: mvn -B "-Dgpg.skip=true" clean verify
-
-  wsimport:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Checkout pcehr-compiled-wsdl-java
-        uses: actions/checkout@v5
-        with:
-          repository: ${{ github.repository_owner }}/pcehr-compiled-wsdl-java
-          ref: java-11-jakarta-full-wsdl
-          path: pcehr-compiled-wsdl-java
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: "11"
-          cache: maven
-      - name: Install pcehr-compiled-wsdl (1.7.1-SNAPSHOT)
-        working-directory: pcehr-compiled-wsdl-java
-        run: mvn -B "-Dgpg.skip=true" clean install -DskipTests
-      - name: Maven verify (-Pwsimport)
-        run: mvn -B "-Dgpg.skip=true" -Pwsimport clean verify
+      - name: Compile sample sources (sample profile)
+        run: mvn -B -Psample "-Dgpg.skip=true" -DskipTests=true clean compile

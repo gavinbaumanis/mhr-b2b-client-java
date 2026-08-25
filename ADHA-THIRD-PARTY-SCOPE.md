@@ -1,53 +1,44 @@
-# ADHA third-party B2B scope (mhr-b2b-client-java)
+# Third-party B2B scope
 
-This library implements My Health Record B2B SOAP services for **third-party software developers** under ADHA published specifications. It tracks the **12 `B2B_*` service WSDLs** vendored in this repository.
+This library implements the **vendor-facing My Health Record B2B** interfaces listed by **mhr-b2b-client-dotnet** (logical names below). Wire SOAP still uses published **`pcehr`** namespaces and operation names; Java packages and type names use **`mhr`**.
 
-Authoritative ADHA documents (obtain current copies from the [Developer Centre](https://developer.digitalhealth.gov.au/)):
+## In scope (full)
 
-| Document | Reference | Relevance |
-| --- | --- | --- |
-| View Service Technical Service Specification | DH-3423 (v2.0, 2021) | `getView` view types |
+| Logical name (.NET README) | Java facade                      | SOAP / IHE backing                      |
+| -------------------------- | -------------------------------- | --------------------------------------- |
+| doesPCEHRExist             | `DoesMHRExistClient`             | MHR profile                             |
+| gainPCEHRAccess            | `GainMHRAccessClient`            | MHR profile                             |
+| uploadDocument             | `UploadDocumentClient`           | Document repository ProvideAndRegister  |
+| retrieveDocument           | `GetDocumentClient`              | Document repository RetrieveDocumentSet |
+| uploadDocumentMetadata     | `UploadDocumentMetadataClient`   | Document registry RegisterDocumentSet-b |
+| findDocuments              | `GetDocumentListClient`          | Document registry RegistryStoredQuery   |
+| removeDocument             | `RemoveDocumentClient`           | removeDocument                          |
+| getAuditView               | `GetAuditViewClient`             | getAuditView                            |
+| getChangeHistoryView       | `GetChangeHistoryViewClient`     | getChangeHistoryView                    |
+| getView                    | `GetViewClient`                  | getView + 7 clinical views              |
+| getTemplate                | `GetTemplateClient`              | getTemplate                             |
+| searchTemplate             | `SearchTemplateClient`           | searchTemplate                          |
+| getIndividualDetailsView   | `GetIndividualDetailsViewClient` | getIndividualDetailsView                |
+| getRepresentativeList      | `GetRepresentativeListClient`    | getRepresentativeList                   |
+| registerPCEHR              | `RegisterMHRClient`              | registerPCEHR                           |
 
----
+### getView clinical views (7)
 
-## View clients (package `clients.view`)
+- healthCheckScheduleView
+- medicareOverview
+- observationView
+- prescriptionAndDispenseView
+- healthRecordOverview
+- diagnosticImagingReportView
+- pathologyReportView
 
-Six facade classes cover record and clinical views. WSDL/XSD sources are under `wsdls/src/main/resources/`; generated types ship in **`au.gov.nehta:pcehr-compiled-wsdl`**.
+Generated request types and facade overloads live in **`mhr-wsdl`** / **`GetViewClient`**. Offline tests **`MhrFacadeCoverageTest`** and **`MhrWsdlArtifactTest`** lock this set.
 
-| Facade | WSDL | Capability |
-| --- | --- | --- |
-| `GetViewClient` | `B2B_GetView` | Third-party clinical view types (see table below) |
-| `GetIndividualDetailsViewClient` | `B2B_GetIndividualDetailsView` | Individual demographics and details held in myHR |
-| `GetRepresentativeListClient` | `B2B_GetRepresentativeList` | Authorised representatives for an individual |
-| `GetAuditViewClient` | `B2B_GetAuditView` | Audit trail for record access |
-| `GetChangeHistoryViewClient` | `B2B_GetChangeHistoryView` | Change history for the record |
-| `GetDocumentListClient` | `B2B_DocumentRegistry` | Document metadata list (XDS query; not a `getView` type) |
+Types and classpath WSDL for the 12 SOAP services are published as **`au.gov.nehta:mhr-wsdl`**.
 
-Samples: `src/sample/java/.../sample/view/`. Offline smoke tests: `ViewClientsSmokeTest`. Integration tests: `src/test/java/.../tests/view/` and `test/system/TestGetView.java` (run with **`-Pintegration`**).
+## Out of scope
 
----
+- **Advance Care Planning** view (NPP / non-vendor packs; not in the .NET third-party README list).
+- **Achievement Diary** view (removed from the vendor B2B pack; see CHANGELOG **1.1.5**).
 
-## Supported `getView` types (`GetViewClient`)
-
-These view payloads work with **`B2B_GetView`** / `GetViewClient` (View Service TSS v2.0 §4.2):
-
-| View | Java request type | Notes |
-| --- | --- | --- |
-| Prescription and dispense | `PrescriptionAndDispenseView` | |
-| Observation | `ObservationView` | |
-| Health check schedule | `HealthCheckScheduleView` | |
-| Medicare overview | `MedicareOverview` | |
-| Pathology report | `PathologyReportView` | Typed response |
-| Diagnostic imaging report | `DiagnosticImagingReportView` | Typed response |
-| Health record overview | `HealthRecordOverView` | Use `versionNumber` `"1.1"` |
-
-XSDs are under `wsdls/src/main/resources/schema/External/View/`. Each type has a typed overload on `GetViewClient`. Custom view types may be passed to `getView(PCEHRHeader, Object)` if you add bindings locally.
-
----
-
-## Related repositories
-
-| Repository | Role |
-| --- | --- |
-| `pcehr-compiled-wsdl-java` | `au.gov.nehta:pcehr-compiled-wsdl` — generated SOAP/JAXB types for this client |
-| `hi-b2b-client-java` | HI only |
+Do not treat commented historical snippets in older source as a gap. Those views are intentionally absent.
