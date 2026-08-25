@@ -6,7 +6,7 @@ Rules: `.cursor/rules/*.mdc`. Do not duplicate in README or CONTRIBUTING.
 |---------|------------------|
 | ASCII only in authored files | `ascii-source.mdc` |
 | Documentation and build scripts (implementor-first, Central, local, OS, paths, no secrets) | `documentation-standards.mdc` |
-| MHR scope, WSDL, build, Java 21 / Jakarta | `mhr-b2b-project.mdc` |
+| MHR scope, WSDL, build, Java 24 / Jakarta | `mhr-b2b-project.mdc` |
 | Worktrees local only; versions in integrator docs | `worktrees.mdc` |
 | Multi-branch edits in one repo - use worktree, not checkout/stash | `multi-branch-worktrees.mdc` |
 | WSDL-to-facade matrix (agent only) | `.cursor/WSDL-CLIENT-PURPOSES.md` |

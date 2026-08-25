@@ -4,14 +4,14 @@
 
 ## Prerequisites
 
-- **JDK 21** with **`JAVA_HOME`** set (see **`maven.compiler.release`** in **`pom.xml`**).
+- **JDK 24** with **`JAVA_HOME`** set (see **`maven.compiler.release`** in **`pom.xml`**).
 - **Maven 3.6.3+** on **`PATH`**.
 
 Dependencies resolve from **[Maven Central](https://central.sonatype.com/)** unless you are installing a **local SNAPSHOT** (below).
 
 ## Versioning
 
-The **first number** of **`au.gov.nehta:mhr-b2b-client`** is the **Java SE** version that this client targets. **21.0.0** is the Java 21 Jakarta line with **15** facades. See **`README.md`**.
+The **first number** of **`au.gov.nehta:mhr-b2b-client`** is the **Java SE** version that this client targets. **24.0.0** is the Java 24 Jakarta line with **15** facades. See **`README.md`**.
 
 **`mhr-b2b-client`** pins sibling **`au.gov.nehta`** libs (**`mhr-wsdl`**, **`common-library`**, **`smi-xsp`**, **`smi-common-utils`**) to **`${project.version}`**. Use the **same** version for those artifacts.
 
@@ -43,7 +43,7 @@ GPG signing is skipped by default (**`-Dgpg.skip=true`**). Release builds: **`-D
 
 ## Local builds (unpublished artifacts)
 
-Install matching sibling **`au.gov.nehta`** libs first (same Java line: **`21.0.0-SNAPSHOT`**):
+Install matching sibling **`au.gov.nehta`** libs first (same Java line: **`24.0.0-SNAPSHOT`**):
 
 ```text
 # in common-library-java / smi-xsp-java / smi-common-utils-java / mhr-wsdl-java

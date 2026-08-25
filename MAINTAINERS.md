@@ -37,7 +37,7 @@ Artifact id stays **`mhr-b2b-client`**; the version distinguishes the Java SE li
 
 On a given branch, **do not change the first number** of **`<version>`**. A new Java SE target is a **new branch**, not a bump on this one.
 
-**This checkout (`21.0.0-SNAPSHOT`):** Java **21**, **Jakarta** facade clients, sibling **`au.gov.nehta`** libs at **`${project.version}`**, **15** facades (no **`wsimport`** in the default lifecycle). Stack and **`.github/workflows/ci.yml`** (branch **`java-21`**, JDK **21**, checkout **`mhr-wsdl-java`** **`java-21`**) below apply to **this line only**.
+**This checkout (`24.0.0-SNAPSHOT`):** Java **24**, **Jakarta** facade clients, sibling **`au.gov.nehta`** libs at **`${project.version}`**, **15** facades (no **`wsimport`** in the default lifecycle). Stack and **`.github/workflows/ci.yml`** (branch **`java-24`**, JDK **24**, checkout **`mhr-wsdl-java`** **`java-24`**) below apply to **this line only**.
 
 Java packages and type names use **`mhr`**. SOAP/XML namespaces, element names, and operation names stay the published B2B contract (**`PCEHRHeader`**, **`registerPCEHR`**, **`/pcehr/`** namespace URIs).
 
@@ -57,16 +57,16 @@ Java packages and type names use **`mhr`**. SOAP/XML namespaces, element names, 
 
 See **`wsdls/readme.txt`**.
 
-## Java / JAX stack (`21.0.0`)
+## Java / JAX stack (`24.0.0`)
 
-- **`maven.compiler.release` 21**
+- **`maven.compiler.release` 24**
 - **`ee4j.jaxws.version`** - **`com.sun.xml.ws:jaxws-rt`** **4.0.5**. Exclude legacy **`webservices-rt`** from **`common-library`** and **`clinical-document-packaging-library`**.
 - Sibling **`au.gov.nehta`** deps (**`mhr-wsdl`**, **`common-library`**, **`smi-xsp`**, **`smi-common-utils`**) at **`${project.version}`**; coordinate GA releases across those repositories.
 - **`maven-enforcer-plugin`:** bans Metro **`webservices-*`** and legacy **`javax.xml.ws`**, **`javax.xml.bind`**, and **`javax.xml.soap`** APIs. Application code uses **Jakarta** XML APIs.
 - **`maven-gpg-plugin`:** skipped unless **`-Dgpg.skip=false`**
-- **`maven-javadoc-plugin`:** **`doclint=none`**, **`failOnWarnings=false`** (aligned with other Java **21** **`au.gov.nehta`** lines)
+- **`maven-javadoc-plugin`:** **`doclint=none`**, **`failOnWarnings=false`** (aligned with other Java **24** **`au.gov.nehta`** lines)
 - Default package is a thin JAR; optional **`-Pfat-jar`** attaches classifier **`all`**.
-- **`.github/workflows/ci.yml`:** GitHub Actions on **`java-21`**, JDK **21**; installs **`mhr-wsdl`** **`21.0.0-SNAPSHOT`** then **`verify`**
+- **`.github/workflows/ci.yml`:** GitHub Actions on **`java-24`**, JDK **24**; installs **`mhr-wsdl`** **`24.0.0-SNAPSHOT`** then **`verify`**
 
 ## Default tests
 
@@ -88,7 +88,7 @@ Tooling lives in **`wsdls/lib/provided/`** (**`jaxws-tools`**, **`jaxws-rt`**, *
 
 ## Contributors vs release publisher (`pom.xml`)
 
-**Contributors (PRs, ordinary changes):** Do not change **`<version>`** (stay on **`-SNAPSHOT`** unless the maintainer requests a bump), **`<scm><tag>`**, or **`distributionManagement`**. If a maintainer requests a SNAPSHOT bump on this branch, change only the trailing numbers (**`21.0.1-SNAPSHOT`**), never the Java SE digit. Leave **`maven-gpg-plugin`** **`skip`** **`true`** so default **`mvn verify`** does not require a signing key. Record user-visible work under **`CHANGELOG.md`** in the **`= <pom-version> =`** block that matches **`pom.xml`** **`<version>`**.
+**Contributors (PRs, ordinary changes):** Do not change **`<version>`** (stay on **`-SNAPSHOT`** unless the maintainer requests a bump), **`<scm><tag>`**, or **`distributionManagement`**. If a maintainer requests a SNAPSHOT bump on this branch, change only the trailing numbers (**`24.0.1-SNAPSHOT`**), never the Java SE digit. Leave **`maven-gpg-plugin`** **`skip`** **`true`** so default **`mvn verify`** does not require a signing key. Record user-visible work under **`CHANGELOG.md`** in the **`= <pom-version> =`** block that matches **`pom.xml`** **`<version>`**.
 
 **Release publisher:** In the release change set: set **`<version>`** to the GA coordinate (no **`-SNAPSHOT`**); set **`<scm><tag>`** to the Git tag you will publish (match existing tag naming). Move **`CHANGELOG.md`** bullets from the snapshot section into a new **`= <GA-version> =`** section; add a fresh **`-SNAPSHOT`** block for the next development cycle. Deploy via Sonatype Central Portal (**`central-publishing-maven-plugin`**; copy **`settings.xml.example`** -> **`settings.xml`**, server id **`central`**). See **Release** below.
 
@@ -107,7 +107,7 @@ Publishing uses **`central-publishing-maven-plugin`** (Sonatype Central Portal).
 
 **Order:** publish **`mhr-wsdl`** and other sibling **`au.gov.nehta`** libs first. This client cannot complete **`verify`** / **`release:perform`** until those coordinates are on Central (or installed locally).
 
-**`-DdevelopmentVersion`:** keep the same first number as **`-DreleaseVersion`** (example on this line: **`21.0.0`** then **`21.0.1-SNAPSHOT`**).
+**`-DdevelopmentVersion`:** keep the same first number as **`-DreleaseVersion`** (example on this line: **`24.0.0`** then **`24.0.1-SNAPSHOT`**).
 
 ### SNAPSHOT or manual GA
 
@@ -115,14 +115,14 @@ Publishing uses **`central-publishing-maven-plugin`** (Sonatype Central Portal).
 2. **`mvn -B "-Prelease" clean verify`**
 3. **`mvn -B "-Prelease" deploy`**
 
-Git/SCM settings for **`maven-release-plugin`** live in **`pom.xml`** properties (**`scm.repo.url`**, **`release.*`**). Tags default to **`{artifactId}-{version}`** (e.g. **`mhr-b2b-client-21.0.0`**).
+Git/SCM settings for **`maven-release-plugin`** live in **`pom.xml`** properties (**`scm.repo.url`**, **`release.*`**). Tags default to **`{artifactId}-{version}`** (e.g. **`mhr-b2b-client-24.0.0`**).
 
 ### Automated GA (`maven-release-plugin`)
 
 Run on the **target branch** with a **clean** working tree. The plugin bumps versions, creates the release tag, deploys from the tag checkout, bumps to the next **`-SNAPSHOT`**, and updates the remote branch and tag (**`pushChanges`** / **`remoteTagging`** in **`pom.xml`**). Git remote credentials (SSH or HTTPS) must work non-interactively.
 
 ```text
-mvn -B "-Prelease" release:prepare release:perform -DreleaseVersion=21.0.0 -DdevelopmentVersion=21.0.1-SNAPSHOT -Dtag=mhr-b2b-client-21.0.0
+mvn -B "-Prelease" release:prepare release:perform -DreleaseVersion=24.0.0 -DdevelopmentVersion=24.0.1-SNAPSHOT -Dtag=mhr-b2b-client-24.0.0
 ```
 
 Replace **`-DreleaseVersion`**, **`-DdevelopmentVersion`**, and **`-Dtag`** for the branch you are on. Omit **`-D...`** only if you accept interactive prompts.
